@@ -1,28 +1,17 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, inject } from "vue";
-import { useAuthStore } from "../stores/auth";
-import { useObsoleteBookmarksStore } from "../stores/obsoleteBookmarks";
-import type { AxiosInstance } from "axios";
+import { onMounted, onUnmounted } from "vue";
+import { useObsoleteStore } from "../stores/obsolete";
 import defaultIcon from "../assets/iconos/default-icon.png";
 
-const api = inject<AxiosInstance>("api")!;
-const authStore = useAuthStore();
-const obsoleteBookmarksStore = useObsoleteBookmarksStore();
+const obsoleteStore = useObsoleteStore();
 
-const loadObsoleteBookmarks = async () => {
-  if (authStore.user) {
-    await obsoleteBookmarksStore.fetchObsoleteBookmarks(api, await authStore.user.getIdToken());
-  }
-};
-
-// Manejador para el evento de actualización
 const handleBookmarksUpdated = () => {
-  loadObsoleteBookmarks();
+  obsoleteStore.fetchObsoleteBookmarks();
 };
 
 onMounted(async () => {
   // Cargar bookmarks obsoletos inicialmente
-  await loadObsoleteBookmarks();
+  await obsoleteStore.fetchObsoleteBookmarks();
   // Agregar listener para actualizaciones
   window.addEventListener('bookmarks-updated', handleBookmarksUpdated);
 });
@@ -42,11 +31,17 @@ const getIconUrl = (faviconUrl: string | undefined) => {
 
 <template>
   <div class="p-4">
-    <div v-if="obsoleteBookmarksStore.obsoleteBookmarks.length > 0">
+    <div v-if="obsoleteStore.loading" class="loading-state">
+      Cargando marcadores obsoletos...
+    </div>
+    <div v-else-if="obsoleteStore.error" class="error-message">
+      {{ obsoleteStore.error }}
+    </div>
+    <div v-else-if="obsoleteStore.items.length > 0">
       <h3 class="obsolete-title">Marcadores Obsoletos</h3>
       <div class="folders-grid">
         <div
-          v-for="item in obsoleteBookmarksStore.obsoleteBookmarks"
+          v-for="item in obsoleteStore.items"
           :key="item.url"
           class="bookmark-wrapper"
         >
@@ -155,6 +150,21 @@ const getIconUrl = (faviconUrl: string | undefined) => {
   background: linear-gradient(145deg, #3a3a3a 0%, #2a2a2a 100%);
   transform: translateY(-1px);
   transition: all 0.2s ease;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  padding: 1rem;
 }
 
 .tooltip {

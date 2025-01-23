@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, inject, computed } from "vue";
-import { useAuthStore } from "../stores/auth";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import FolderComponent from "./FolderComponent.vue";
 import BookmarkComponent from "./BookmarkComponent.vue";
-import type { AxiosInstance } from "axios";
+import { useBookmarksStore } from "../stores/bookmarks";
 import type { BookmarkItem } from "../types/bookmarks";
 
-const api = inject<AxiosInstance>("api")!;
-const bookmarks = ref<BookmarkItem[]>([]);
+const bookmarksStore = useBookmarksStore();
 const currentFolder = ref<BookmarkItem | null>(null);
-const authStore = useAuthStore();
-const error = ref<string | null>(null);
 
 const displayedItems = computed(() => {
-  return currentFolder.value ? currentFolder.value.children : bookmarks.value;
+  return currentFolder.value ? currentFolder.value.children : bookmarksStore.items;
 });
 
 const sortedDisplayedItems = computed(() => {
@@ -24,33 +20,14 @@ const sortedDisplayedItems = computed(() => {
   ];
 });
 
-const loadBookmarks = async () => {
-  try {
-    if (authStore.user) {
-      const response = await api.get("/bookmarks", {
-        headers: {
-          Authorization: `Bearer ${await authStore.user.getIdToken()}`,
-        },
-      });
-      bookmarks.value = response.data.data.bookmarks;
-      error.value = null;
-    }
-  } catch (err: any) {
-    console.error("Error al obtener los marcadores:", err);
-    error.value =
-      err.response?.data?.message ||
-      "Error desconocido al obtener los marcadores";
-  }
-};
-
 // Manejador para el evento de actualización
 const handleBookmarksUpdated = () => {
-  loadBookmarks();
+  bookmarksStore.fetchBookmarks();
 };
 
 onMounted(async () => {
   // Cargar bookmarks inicialmente
-  await loadBookmarks();
+  await bookmarksStore.fetchBookmarks();
   // Agregar listener para actualizaciones
   window.addEventListener('bookmarks-updated', handleBookmarksUpdated);
 });
@@ -71,8 +48,8 @@ const closeFolder = () => {
 
 <template>
   <div class="p-4 bg-gray-900">
-    <div v-if="error">
-      <p class="text-red-500">{{ error }}</p>
+    <div v-if="bookmarksStore.error">
+      <p class="text-red-500">{{ bookmarksStore.error }}</p>
     </div>
     <div v-else>
       <div v-if="currentFolder" class="folder-header">
@@ -82,7 +59,10 @@ const closeFolder = () => {
         <h2 class="folder-title">{{ currentFolder.title }}</h2>
       </div>
 
-      <div class="folders-grid">
+      <div v-if="bookmarksStore.loading" class="loading-state">
+        Cargando marcadores...
+      </div>
+      <div v-else class="folders-grid">
         <template v-for="item in sortedDisplayedItems" :key="item.id">
           <FolderComponent
             v-if="item.type === 'folder'"
@@ -148,5 +128,14 @@ const closeFolder = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+  font-size: 1.1rem;
 }
 </style>

@@ -22,14 +22,19 @@ El proyecto está organizado en módulos principales que manejan diferentes aspe
 - `auth.ts`: Manejo del estado de autenticación.
 - `favorites.ts`: Gestión del estado de marcadores favoritos.
 - `obsoleteBookmarks.ts`: Gestión de marcadores obsoletos.
+- `favicons.ts`: Gestión de iconos personalizados y su sincronización.
+- `bookmarks.ts`: Gestión principal de marcadores y su estructura.
+- `xbel-reload.ts`: Manejo de la recarga de datos XBEL.
 
 ## Funcionalidades
 
 ### Sistema de Marcadores
 - Visualización de marcadores organizados en carpetas
 - Navegación jerárquica entre carpetas
-- Previsualización de iconos de sitios web
+- Previsualización de iconos de sitios web con diseño uniforme
+- Personalización de iconos para cada marcador
 - Tooltips con información adicional
+- Interfaz mejorada con iconos perfectamente centrados
 
 ### Gestión de Favoritos
 - Marcar/desmarcar marcadores como favoritos
@@ -50,6 +55,8 @@ La aplicación se comunica con el backend a través de los siguientes endpoints:
 - `POST /favorites`: Añade un marcador a favoritos
 - `DELETE /favorites/:url`: Elimina un marcador de favoritos
 - `GET /obsolete-bookmarks`: Obtiene la lista de marcadores potencialmente obsoletos
+- `POST /favicons/:url`: Sube un favicon personalizado para un marcador específico
+- `GET /favicons/:url`: Obtiene el favicon personalizado de un marcador
 
 ## Configuración del Proyecto
 

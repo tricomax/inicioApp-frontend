@@ -2,9 +2,10 @@
 import { ref, inject, computed, type PropType } from "vue";
 import { useAuthStore } from "../stores/auth";
 import { useFavoritesStore } from '../stores/favorites';
+import { useFaviconsStore } from '../stores/favicons';
 import type { AxiosInstance } from "axios";
 import type { BookmarkItem } from "../types/bookmarks";
-import defaultIcon from "../assets/iconos/default-icon.png"; // Añadir esta importación
+import defaultIcon from "../assets/iconos/default-icon.png";
 
 const props = defineProps({
   item: {
@@ -16,8 +17,11 @@ const props = defineProps({
 const api = inject<AxiosInstance>("api")!;
 const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
+const faviconsStore = useFaviconsStore();
 
 const isFavorite = computed(() => favoritesStore.isFavorite(props.item.url || ''));
+const isUploading = computed(() => faviconsStore.uploading);
+const uploadError = computed(() => faviconsStore.error);
 
 const toggleFavorite = async (event: Event) => {
   event.stopPropagation();
@@ -36,6 +40,33 @@ const getIconUrl = computed(() => {
   }
   return defaultIcon;
 });
+
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+const handleEditClick = (event: Event) => {
+  event.stopPropagation();
+  if (fileInputRef.value) {
+    fileInputRef.value.click();
+  }
+};
+
+const handleFileSelect = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+
+  if (file && props.item.url) {
+    try {
+      await faviconsStore.saveCustomFavicon(props.item.url, file);
+    } catch (error) {
+      console.error('Error al guardar el favicon:', error);
+    } finally {
+      // Limpiar el input para permitir subir el mismo archivo nuevamente
+      if (fileInputRef.value) {
+        fileInputRef.value.value = '';
+      }
+    }
+  }
+};
 </script>
 
 <template>
@@ -59,13 +90,37 @@ const getIconUrl = computed(() => {
             :src="getIconUrl"
             :alt="item.title"
             class="bookmark-icon"
+            :class="{ 'uploading': isUploading }"
             @error="($event.target as HTMLImageElement).src = defaultIcon"
           />
         </div>
       </a>
+      <div class="edit-controls">
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept="image/*"
+          class="hidden-input"
+          @change="handleFileSelect"
+        />
+        <button
+          v-if="!isUploading"
+          class="edit-button"
+          @click="handleEditClick"
+          title="Cambiar icono"
+        >
+          ✏️
+        </button>
+        <div v-else class="loading-indicator" title="Subiendo icono...">
+          ⌛
+        </div>
+      </div>
     </div>
     <div class="bookmark-title">
       {{ item.title }}
+    </div>
+    <div v-if="uploadError" class="error-tooltip">
+      {{ uploadError }}
     </div>
     <div class="tooltip">{{ item.title }}</div>
   </div>
@@ -74,8 +129,8 @@ const getIconUrl = computed(() => {
 <style scoped>
 .bookmark-card {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
   border: 2px solid #444;
   border-radius: 12px;
@@ -84,13 +139,12 @@ const getIconUrl = computed(() => {
 
 .bookmark-content {
   height: 100%;
-  padding: 8px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   text-decoration: none;
   color: white;
+  padding: 4px;
 }
 
 .bookmark-title {
@@ -105,24 +159,30 @@ const getIconUrl = computed(() => {
 }
 
 .icon-container {
-  width: 48px;
-  height: 48px;
+  width: 60%;
+  height: 60%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4px 0;
+  margin: auto;
 }
 
 .bookmark-icon {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  transition: opacity 0.2s ease;
+  padding: 4px;
+}
+
+.bookmark-icon.uploading {
+  opacity: 0.5;
 }
 
 .bookmark-wrapper {
   position: relative;
-  width: 90px;      /* Ajustado a 90px para mantener consistencia */
-  height: 90px;     /* Altura igual al ancho para forma cuadrada */
+  width: 90px;
+  height: 90px;
   display: flex;
   flex-direction: column;
 }
@@ -162,7 +222,64 @@ const getIconUrl = computed(() => {
   text-shadow: 0 0 2px rgba(0,0,0,0.5);
 }
 
-.tooltip {
+.edit-controls {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.bookmark-wrapper:hover .edit-controls {
+  opacity: 1;
+}
+
+.edit-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.edit-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.hidden-input {
+  display: none;
+}
+
+.loading-indicator {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tooltip, .error-tooltip {
   position: absolute;
   bottom: calc(100% + 10px);
   left: 50%;
@@ -181,7 +298,12 @@ const getIconUrl = computed(() => {
   z-index: 20;
 }
 
-.tooltip::after {
+.error-tooltip {
+  background: rgba(231, 76, 60, 0.9);
+  border-color: #c0392b;
+}
+
+.tooltip::after, .error-tooltip::after {
   content: '';
   position: absolute;
   bottom: -5px;
@@ -191,10 +313,22 @@ const getIconUrl = computed(() => {
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
+}
+
+.tooltip::after {
   border-top: 5px solid rgba(0, 0, 0, 0.9);
 }
 
+.error-tooltip::after {
+  border-top: 5px solid rgba(231, 76, 60, 0.9);
+}
+
 .bookmark-wrapper:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.error-tooltip {
   opacity: 1;
   transform: translateX(-50%) scale(1);
 }

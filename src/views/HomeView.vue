@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { useAuthStore } from "../stores/auth";
-import { useUpdateStore } from "../stores/update";
+import { useXbelReloadStore } from "../stores/xbel-reload";
 import FavModule from "../components/FavModule.vue";
 import MainModule from "../components/MainModule.vue";
 import ObsoleteModule from "../components/ObsoleteModule.vue";
 
 const authStore = useAuthStore();
-const updateStore = useUpdateStore();
+const xbelReloadStore = useXbelReloadStore();
 
-const handleUpdate = async () => {
-  await updateStore.updateServer();
+const handleXbelReload = async () => {
+  await xbelReloadStore.reloadXbel();
 };
 </script>
 
@@ -24,24 +24,24 @@ const handleUpdate = async () => {
     <div>
       <ObsoleteModule />
     </div>
-    <div class="update-section">
-      <div v-if="updateStore.error" class="error-message">
-        {{ updateStore.error }}
+    <div class="reload-section">
+      <div v-if="xbelReloadStore.error" class="error-message">
+        {{ xbelReloadStore.error }}
       </div>
       <button
-        @click="handleUpdate"
-        :disabled="updateStore.isUpdating"
-        class="update-button"
+        @click="handleXbelReload"
+        :disabled="xbelReloadStore.isReloading"
+        class="reload-button"
       >
-        <span v-if="updateStore.isUpdating">Actualizando...</span>
-        <span v-else>Actualizar servidor</span>
+        <span v-if="xbelReloadStore.isReloading">Recargando XBEL...</span>
+        <span v-else>Recargar XBEL</span>
       </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.update-section {
+.reload-section {
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -49,7 +49,7 @@ const handleUpdate = async () => {
   gap: 1rem;
 }
 
-.update-button {
+.reload-button {
   padding: 0.75rem 1.5rem;
   background: #2c3e50;
   color: white;
@@ -60,11 +60,11 @@ const handleUpdate = async () => {
   transition: background 0.2s ease;
 }
 
-.update-button:hover:not(:disabled) {
+.reload-button:hover:not(:disabled) {
   background: #34495e;
 }
 
-.update-button:disabled {
+.reload-button:disabled {
   background: #95a5a6;
   cursor: not-allowed;
 }
