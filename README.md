@@ -1,6 +1,6 @@
 # inicioApp-frontend
 
-Aplicación web para gestionar marcadores web con soporte para carpetas, favoritos y detección de enlaces obsoletos.
+Inicioapp-frontend como su nombre indica es el frontend del servidor inicioapp-backend https://github.com/tricomax/inicioapp-backend
 
 ## Estructura del Proyecto
 
