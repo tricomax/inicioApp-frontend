@@ -1,0 +1,95 @@
+<script setup lang="ts">
+import { onMounted, onUnmounted, inject } from "vue";
+import { useAuthStore } from "../stores/auth";
+import { useFavoritesStore } from '../stores/favorites';
+import type { AxiosInstance } from "axios";
+import BookmarkComponent from "./BookmarkComponent.vue";
+
+const api = inject<AxiosInstance>("api")!;
+const authStore = useAuthStore();
+const favoritesStore = useFavoritesStore();
+
+const loadFavorites = async () => {
+  try {
+    if (authStore.user) {
+      await favoritesStore.fetchFavorites();
+    }
+  } catch (error) {
+    console.error("Error fetching favorites:", error);
+  }
+};
+
+// Manejador para el evento de actualización
+const handleBookmarksUpdated = () => {
+  loadFavorites();
+};
+
+onMounted(async () => {
+  // Cargar favoritos inicialmente
+  await loadFavorites();
+  // Agregar listener para actualizaciones
+  window.addEventListener('bookmarks-updated', handleBookmarksUpdated);
+});
+
+onUnmounted(() => {
+  // Limpiar el listener cuando el componente se destruye
+  window.removeEventListener('bookmarks-updated', handleBookmarksUpdated);
+});
+</script>
+
+<template>
+  <div class="p-4">
+    <h3 class="fav-title">Favoritos</h3>
+    <div v-if="favoritesStore.items.length > 0" class="favorites-grid">
+      <BookmarkComponent
+        v-for="item in favoritesStore.items"
+        :key="item.url"
+        :item="item"
+        class="bookmark-item"
+      />
+    </div>
+    <div v-else class="empty-favorites">
+      <p>No tienes favoritos aún</p>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.favorites-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+  background: #1a1a1a;
+  min-height: 100px;
+  border: 2px solid #333;
+  border-radius: 12px;
+}
+
+.empty-favorites {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  color: #666;
+}
+
+.fav-title {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+.bookmark-item {
+  width: 90px !important;  /* Ligeramente más pequeño que las carpetas */
+  height: 90px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+</style>

@@ -1,0 +1,152 @@
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, inject, computed } from "vue";
+import { useAuthStore } from "../stores/auth";
+import FolderComponent from "./FolderComponent.vue";
+import BookmarkComponent from "./BookmarkComponent.vue";
+import type { AxiosInstance } from "axios";
+import type { BookmarkItem } from "../types/bookmarks";
+
+const api = inject<AxiosInstance>("api")!;
+const bookmarks = ref<BookmarkItem[]>([]);
+const currentFolder = ref<BookmarkItem | null>(null);
+const authStore = useAuthStore();
+const error = ref<string | null>(null);
+
+const displayedItems = computed(() => {
+  return currentFolder.value ? currentFolder.value.children : bookmarks.value;
+});
+
+const sortedDisplayedItems = computed(() => {
+  const items = displayedItems.value || [];
+  return [
+    ...items.filter(item => item.type === 'folder'),
+    ...items.filter(item => item.type === 'bookmark')
+  ];
+});
+
+const loadBookmarks = async () => {
+  try {
+    if (authStore.user) {
+      const response = await api.get("/bookmarks", {
+        headers: {
+          Authorization: `Bearer ${await authStore.user.getIdToken()}`,
+        },
+      });
+      bookmarks.value = response.data.data.bookmarks;
+      error.value = null;
+    }
+  } catch (err: any) {
+    console.error("Error al obtener los marcadores:", err);
+    error.value =
+      err.response?.data?.message ||
+      "Error desconocido al obtener los marcadores";
+  }
+};
+
+// Manejador para el evento de actualización
+const handleBookmarksUpdated = () => {
+  loadBookmarks();
+};
+
+onMounted(async () => {
+  // Cargar bookmarks inicialmente
+  await loadBookmarks();
+  // Agregar listener para actualizaciones
+  window.addEventListener('bookmarks-updated', handleBookmarksUpdated);
+});
+
+onUnmounted(() => {
+  // Limpiar el listener cuando el componente se destruye
+  window.removeEventListener('bookmarks-updated', handleBookmarksUpdated);
+});
+
+const openFolder = (folder: BookmarkItem) => {
+  currentFolder.value = folder;
+};
+
+const closeFolder = () => {
+  currentFolder.value = null;
+};
+</script>
+
+<template>
+  <div class="p-4 bg-gray-900">
+    <div v-if="error">
+      <p class="text-red-500">{{ error }}</p>
+    </div>
+    <div v-else>
+      <div v-if="currentFolder" class="folder-header">
+        <button @click="closeFolder" class="back-button">
+          <span class="mr-2">←</span> Volver
+        </button>
+        <h2 class="folder-title">{{ currentFolder.title }}</h2>
+      </div>
+
+      <div class="folders-grid">
+        <template v-for="item in sortedDisplayedItems" :key="item.id">
+          <FolderComponent
+            v-if="item.type === 'folder'"
+            :item="item"
+            @open-folder="openFolder"
+          />
+          <BookmarkComponent
+            v-else
+            :item="item"
+            class="bookmark-item"
+          />
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.folders-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+  background: #1a1a1a;
+  min-height: 100px;
+  border: 2px solid #333;
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.back-button {
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.folder-title {
+  flex: 1;
+  text-align: center;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-right: 120px; /* Compensa el ancho del botón para un mejor centrado */
+}
+
+.bookmark-item {
+  width: 90px !important;  /* Ligeramente más pequeño que las carpetas */
+  height: 90px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+</style>
