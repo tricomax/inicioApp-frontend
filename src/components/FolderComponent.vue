@@ -2,7 +2,6 @@
 import { ref, computed, type PropType } from "vue";
 import type { BookmarkItem } from "../types/bookmarks";
 import folderIcon from "../assets/iconos/folder-icon.png";
-import { useRouter } from "vue-router";
 import defaultIcon from "../assets/iconos/default-icon.png";
 
 const props = defineProps({
@@ -11,8 +10,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const router = useRouter();
 
 const hasChildren = computed(() => {
   return props.item.children && props.item.children.length > 0;

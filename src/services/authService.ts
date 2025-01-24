@@ -1,5 +1,4 @@
 import {
-  getAuth,
   GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged,
@@ -8,59 +7,72 @@ import {
 } from 'firebase/auth';
 import { useAuthStore } from '../stores/auth';
 import { auth } from '../firebase/config';
-import router from '../router';
 
+/**
+ * Proveedor de autenticación de Google para Firebase.
+ * Se configura una única instancia para su reutilización.
+ */
 const provider = new GoogleAuthProvider();
 
+/**
+ * Servicio que gestiona la autenticación de usuarios mediante Firebase.
+ * Proporciona funcionalidades para iniciar sesión con Google, cerrar sesión
+ * y mantener el estado de autenticación sincronizado.
+ */
 export const authService = {
+  /**
+   * Inicializa el observador del estado de autenticación.
+   * Mantiene sincronizado el estado de la aplicación con Firebase Auth.
+   */
   init() {
     const store = useAuthStore();
 
     onAuthStateChanged(auth, (user: User | null) => {
       store.setUser(user);
       if (user) {
-        // Usuario ha iniciado sesión
-        console.log('Usuario logueado:', user.uid);
+        console.log('Usuario autenticado:', user.uid);
       } else {
-        // Usuario ha cerrado sesión
         console.log('Usuario ha cerrado sesión');
-        router.push('/'); // Redirige a la página de inicio
       }
     });
   },
+
+  /**
+   * Inicia el proceso de autenticación con Google mediante una ventana emergente.
+   *
+   * @returns Promise<User | undefined> - Usuario autenticado o undefined si falla la autenticación
+   */
   async login(): Promise<User | undefined> {
     try {
       const result = await signInWithPopup(auth, provider);
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      // const token = credential!.accessToken;  // No es necesario por ahora, pero puede servirte para acceder a las apis de google
-      // The signed-in user info.
       const user = result.user;
-      console.log('Usuario logueado:', user.uid);
-      // IdP data available using getAdditionalUserInfo(result)
-      // ...
+      console.log('Inicio de sesión exitoso:', user.uid);
       return user;
     } catch (error) {
-      // Handle Errors here.
       if (error instanceof Error) {
-        console.error('Error during login:', error.message);
+        console.error('Error durante el inicio de sesión:', error.message);
       } else {
-        console.error('An unknown error occurred during login');
+        console.error('Error desconocido durante el inicio de sesión');
       }
       return undefined;
     }
   },
+
+  /**
+   * Cierra la sesión del usuario actual.
+   * Gestiona errores que puedan ocurrir durante el proceso.
+   */
   async logout() {
     try {
       await signOut(auth);
       console.log('Sesión cerrada correctamente');
-      router.push('/'); // Redirige a la página de inicio
     } catch (error) {
+      let errorMessage = 'Error desconocido al cerrar sesión';
       if (error instanceof Error) {
-        console.error('Error al cerrar sesión:', error.message);
-      } else {
-        console.error('An unknown error occurred while logging out');
+        errorMessage = error.message;
       }
+      console.error('Error al cerrar sesión:', errorMessage);
+      throw new Error(errorMessage);
     }
   },
 };
