@@ -32,9 +32,13 @@ const handleXbelReload = async () => {
         @click="handleXbelReload"
         :disabled="xbelReloadStore.isReloading"
         class="reload-button"
+        :class="{ 'is-reloading': xbelReloadStore.isReloading }"
       >
-        <span v-if="xbelReloadStore.isReloading">Recargando XBEL...</span>
-        <span v-else>Recargar XBEL</span>
+        <span v-if="xbelReloadStore.isReloading">
+          <span class="spin-icon">⌛</span>
+          Recargando XBEL...
+        </span>
+        <span v-else>↻ Recargar XBEL</span>
       </button>
     </div>
   </div>
@@ -44,6 +48,7 @@ const handleXbelReload = async () => {
 body {
   background-color: black;
   color: white;
+  font-family: Arial, sans-serif;
 }
 
 .reload-section {
@@ -62,16 +67,40 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 1rem;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .reload-button:hover:not(:disabled) {
   background: #34495e;
+  transform: translateY(-1px);
 }
 
 .reload-button:disabled {
-  background: #95a5a6;
-  cursor: not-allowed;
+  background: #34495e;
+  cursor: progress;
+  opacity: 0.8;
+}
+
+.reload-button.is-reloading {
+  padding-right: 2rem;
+}
+
+.spin-icon {
+  display: inline-block;
+  animation: spin 2s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {

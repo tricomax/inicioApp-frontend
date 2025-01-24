@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { BookmarkItem } from '../types/bookmarks';
 import axios from 'axios';
+import { useBookmarksStore } from './bookmarks';
 
 /**
  * Store que gestiona los marcadores favoritos del usuario.
@@ -21,6 +22,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
     loading.value = true;
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/favorites`);
+      console.log('Datos de favoritos:', response.data.data.favorites);
       items.value = response.data.data.favorites;
       error.value = null;
     } catch (err: any) {
@@ -38,13 +40,30 @@ export const useFavoritesStore = defineStore('favorites', () => {
   const addFavorite = async (bookmark: BookmarkItem) => {
     loading.value = true;
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/favorites`, {
+      console.log('Añadiendo favorito con datos:', {
         url: bookmark.url,
         title: bookmark.title,
-        faviconUrl: bookmark.faviconUrl
+        location: bookmark.location
       });
-      items.value.push(bookmark);
+
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/favorites`, {
+        url: bookmark.url,
+        title: bookmark.title,
+        location: bookmark.location
+      });
+
+      console.log('Respuesta al añadir favorito:', response.data);
+
+      if (response.data.data && response.data.data.favorite) {
+        items.value.push(response.data.data.favorite);
+      } else {
+        items.value.push(bookmark);
+      }
       error.value = null;
+
+      // Actualizar la caché de bookmarks para mantener los favicons sincronizados
+      const bookmarksStore = useBookmarksStore();
+      await bookmarksStore.fetchBookmarks();
     } catch (err: any) {
       console.error('Error al añadir favorito:', err);
       error.value = err.response?.data?.message || 'Error al añadir favorito';

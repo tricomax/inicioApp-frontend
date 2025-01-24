@@ -49,6 +49,7 @@ export const useBookmarksStore = defineStore('bookmarks', () => {
         }
       );
 
+      console.log('Datos de bookmarks:', response.data.data.bookmarks);
       items.value = response.data.data.bookmarks;
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || "Error desconocido al obtener los marcadores";

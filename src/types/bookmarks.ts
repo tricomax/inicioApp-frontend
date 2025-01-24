@@ -3,7 +3,6 @@ export interface BookmarkItem {
   title: string;
   type: "bookmark" | "folder";
   url?: string;
-  favicon?: string;
-  faviconUrl?: string; // URL completa del favicon desde el backend
+  location?: string; // Ruta al favicon (/favicons/...)
   children?: BookmarkItem[];
 }

@@ -35,9 +35,19 @@ const toggleFavorite = async (event: Event) => {
 };
 
 const getIconUrl = computed(() => {
-  if (props.item.faviconUrl) {
-    return `${import.meta.env.VITE_API_BASE_URL}${props.item.faviconUrl}`;
+  console.log('Datos del bookmark:', {
+    url: props.item.url,
+    location: props.item.location
+  });
+
+  // Si tenemos una ruta al favicon, la usamos
+  if (props.item.location && props.item.location.startsWith('/')) {
+    const url = `${import.meta.env.VITE_API_BASE_URL}${props.item.location}`;
+    console.log('Usando location:', url);
+    return url;
   }
+
+  console.log('Usando icono por defecto');
   return defaultIcon;
 });
 
@@ -91,7 +101,14 @@ const handleFileSelect = async (event: Event) => {
             :alt="item.title"
             class="bookmark-icon"
             :class="{ 'uploading': isUploading }"
-            @error="($event.target as HTMLImageElement).src = defaultIcon"
+            @error="(e) => {
+              console.error('❌ Icono no encontrado:', {
+                url_marcador: item.url,
+                titulo: item.title,
+                icono_fallido: (e.target as HTMLImageElement).src
+              });
+              (e.target as HTMLImageElement).src = defaultIcon;
+            }"
           />
         </div>
       </a>

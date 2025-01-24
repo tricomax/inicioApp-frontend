@@ -30,8 +30,9 @@ const displayedChildren = computed(() => {
 
 const getItemIcon = (item: BookmarkItem) => {
   if (item.type === 'bookmark') {
-    if (item.faviconUrl) {
-      return `${import.meta.env.VITE_API_BASE_URL}${item.faviconUrl}`;
+    // Si tenemos una ruta al favicon, la usamos
+    if (item.location && item.location.startsWith('/')) {
+      return `${import.meta.env.VITE_API_BASE_URL}${item.location}`;
     }
     return defaultIcon;
   }
