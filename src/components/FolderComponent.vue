@@ -50,6 +50,10 @@ const getItemIcon = (item: BookmarkItem) => {
           :src="getItemIcon(child)"
           :alt="child.title"
           class="preview-icon"
+          @error="($event.target as HTMLImageElement).src = defaultIcon"
+          loading="lazy"
+          decoding="async"
+          referrerpolicy="no-referrer"
         />
       </div>
     </div>
