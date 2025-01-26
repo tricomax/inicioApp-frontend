@@ -54,7 +54,7 @@ const getIconUrl = (faviconUrl: string | undefined) => {
             >
               <div class="icon-container">
                 <img
-                  :src="getIconUrl(item.faviconUrl)"
+                  :src="getIconUrl(item.location)"
                   :alt="item.title"
                   class="bookmark-icon"
                   @error="($event.target as HTMLImageElement).src = defaultIcon"
