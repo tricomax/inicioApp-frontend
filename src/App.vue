@@ -33,12 +33,13 @@ const handleLogout = async () => {
 <template>
   <div class="app-container">
     <div class="app-content">
-      <h3 class="fav-title">Favoritos</h3>
-      <!-- Botón de logout -->
-      <div v-if="authStore.isAuthenticated" class="logout-container">
-        <button @click="handleLogout" class="logout-button">
-          Cerrar sesión
-        </button>
+      <div class="header-container">
+        <h3 class="fav-title">Favoritos</h3>
+        <div v-if="authStore.isAuthenticated" class="logout-container">
+          <button @click="handleLogout" class="logout-button">
+            Cerrar sesión
+          </button>
+        </div>
       </div>
 
       <div class="module-container">
@@ -71,48 +72,45 @@ const handleLogout = async () => {
   </div>
 </template>
 
-<style>
-
-.fav-title {
-  font-size: 1.2rem;
-  color: #888;
-  padding-top: 0.2rem;
-}
-
-body {
-  background-color: black;
-  color: white;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
+<style scoped>
 
 .app-container {
   min-height: 100vh;
 }
 
-/* Estilos para el botón de logout */
-.logout-container {
-  position: absolute;
-  right: calc((100% - 95%) / 2);
-  top: 1rem;
-  z-index: 100;
+.app-container .header-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0 0 0;
 }
 
-.logout-button {
-  padding: 0.5rem 1rem;
+.app-container .fav-title {
+  font-size: 1.2rem;
+  color: #888;
+  margin: 0;
+  padding-left: 1rem;
+  height: 28px;
+}
+
+.app-container .logout-container {
+  display: flex;
+  align-items: flex-end;
+}
+
+.app-container .logout-button {
+  margin-right: 1rem;
+  padding: 0.3rem 1rem;
   background: transparent;
   color: #ccc;
-  border: 2px solid #333;
+  border: 2px solid #7b7265;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
 }
 
 .logout-button:hover {
-  background: #3a3a3a;
+  background: #7b7265;
   color: white;
-  border: 2px solid #333;
 }
 
 /* Estilos existentes */
@@ -124,11 +122,11 @@ body {
   gap: 1rem;
 }
 
-.reload-button {
+.app-container .reload-button {
   padding: 0.75rem 1.5rem;
   background: transparent;
   color: white;
-  border: 2px solid #333;
+  border: 2px solid #7b7265;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
@@ -138,53 +136,44 @@ body {
   gap: 0.5rem;
 }
 
-.reload-button:hover:not(:disabled) {
-  background: #3a3a3a;
+.app-container .reload-button:hover:not(:disabled) {
+  background: #7b7265;
   transform: translateY(-1px);
 }
 
-.reload-button:disabled {
+.app-container .reload-button:disabled {
   background: #34495e;
   cursor: progress;
   opacity: 0.8;
 }
 
-.reload-button.is-reloading {
+.app-container .reload-button.is-reloading {
   padding-right: 2rem;
 }
 
-.spin-icon {
+.app-container .spin-icon {
   display: inline-block;
   animation: spin 2s linear infinite;
   margin-right: 0.5rem;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.error-message {
+.app-container .error-message {
   color: #e74c3c;
   text-align: center;
   margin-bottom: 0.5rem;
 }
 
-.app-content {
+.app-container .app-content {
   width: 95%;
   margin: 0 auto;
 }
 
-.module-container {
+.app-container .module-container {
   width: 100%;
-  margin: 1rem auto;
-}
-
-.module-container:first-of-type {
-  margin-top: 1rem;
 }
 </style>

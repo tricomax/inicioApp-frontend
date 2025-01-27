@@ -71,7 +71,7 @@ const getItemIcon = (item: BookmarkItem) => {
   border-radius: 8px;
   width: 100px;
   cursor: pointer;
-  border: 1px solid #444;
+  border: 2px solid #7b7265;
 }
 
 .folder-container {
@@ -99,41 +99,54 @@ const getItemIcon = (item: BookmarkItem) => {
 }
 
 .folder-preview {
-  @apply relative w-full h-full flex items-center justify-center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .folder-content-preview {
-  @apply grid grid-cols-3 gap-0.5 p-1.5;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.125rem;
+  padding: 0.375rem;
   width: 100%;
   height: 100%;
 }
 
 .preview-item {
-  @apply flex items-center justify-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .preview-icon {
-  @apply w-4 h-4; /* Smaller icons for iOS style */
+  width: 1rem;
+  height: 1rem;
 }
 
 /* Add subtle inner shadow for depth */
 .folder-container::before {
   content: '';
-  @apply absolute inset-0 rounded-2xl;
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1),
               inset 0 -1px 1px rgba(0, 0, 0, 0.1);
 }
 
 /* Optional hover effect */
 .folder-container:hover {
-  @apply bg-gray-700/80;
+  background-color: rgba(55, 65, 81, 0.8);
 }
 
 .folder {
   width: 200px;
   height: 200px;
   background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
-  border: 2px solid #444;
+  border: 2px solid #7b7265;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -191,7 +204,7 @@ const getItemIcon = (item: BookmarkItem) => {
 
 /* Efecto hover */
 .folder:hover {
-  background: linear-gradient(145deg, #3a3a3a 0%, #2a2a2a 100%);
+  background: #7b7265;
   transform: translateY(-1px);
   transition: all 0.2s ease;
 }

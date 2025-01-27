@@ -47,14 +47,14 @@ const closeFolder = () => {
 </script>
 
 <template>
-  <div class="p-4 bg-gray-900">
+  <div class="main-container">
     <div v-if="bookmarksStore.error">
-      <p class="text-red-500">{{ bookmarksStore.error }}</p>
+      <p class="error-text">{{ bookmarksStore.error }}</p>
     </div>
     <div v-else>
       <div v-if="currentFolder" class="folder-header">
         <button @click="closeFolder" class="back-button">
-          <span class="mr-2">←</span> Volver
+          <span class="arrow-back">←</span> Volver
         </button>
         <h2 class="folder-title">{{ currentFolder.title }}</h2>
       </div>
@@ -81,6 +81,18 @@ const closeFolder = () => {
 </template>
 
 <style scoped>
+.main-container {
+  padding: 1rem 1rem 0;
+}
+
+.error-text {
+  color: #ef4444;  /* equivalente a text-red-500 */
+}
+
+.arrow-back {
+  margin-right: 0.5rem;  /* equivalente a mr-2 */
+}
+
 .folders-grid {
   display: flex;
   flex-wrap: wrap;
@@ -88,7 +100,7 @@ const closeFolder = () => {
   padding: 16px;
   background: #1a1a1a;
   min-height: 100px;
-  border: 2px solid #333;
+  border: 2px solid #7b7265;
   border-radius: 12px;
   margin-top: 1rem;
 }
@@ -97,7 +109,6 @@ const closeFolder = () => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.5rem 0;
 }
 
 .back-button {
@@ -106,10 +117,11 @@ const closeFolder = () => {
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.1);
   transition: background 0.2s ease;
+  border: 2px solid #7b7265;
 }
 
 .back-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #7b7265;
 }
 
 .folder-title {

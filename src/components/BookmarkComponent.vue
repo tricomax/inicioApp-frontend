@@ -149,7 +149,7 @@ const handleFileSelect = async (event: Event) => {
   width: 90px;
   height: 90px;
   background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
-  border: 2px solid #444;
+  border: 2px solid #7b7265;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -205,7 +205,7 @@ const handleFileSelect = async (event: Event) => {
 }
 
 .bookmark-card:hover {
-  background: linear-gradient(145deg, #3a3a3a 0%, #2a2a2a 100%);
+  background: #7b7265;
   transform: translateY(-1px);
   transition: all 0.2s ease;
 }

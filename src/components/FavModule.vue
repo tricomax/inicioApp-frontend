@@ -38,7 +38,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="fav-container">
     <div v-if="favoritesStore.items.length > 0" class="favorites-grid">
       <BookmarkComponent
         v-for="item in favoritesStore.items"
@@ -54,6 +54,10 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.fav-container {
+  padding: 1rem 1rem 0;
+}
+
 .favorites-grid {
   display: flex;
   flex-wrap: wrap;
@@ -61,7 +65,7 @@ onUnmounted(() => {
   padding: 16px;
   background: #1a1a1a;
   min-height: 100px;
-  border: 2px solid #333;
+  border: 2px solid #7b7265;
   border-radius: 12px;
 }
 
@@ -71,7 +75,7 @@ onUnmounted(() => {
   align-items: center;
   height: 100px;
   background: #1a1a1a;
-  border: 2px solid #333;
+  border: 2px solid #7b7265;
   border-radius: 12px;
   color: #666;
 }

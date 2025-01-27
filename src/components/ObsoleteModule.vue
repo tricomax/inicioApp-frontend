@@ -30,7 +30,7 @@ const getIconUrl = (faviconUrl: string | undefined) => {
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="obsolete-container">
     <div v-if="obsoleteStore.loading" class="loading-state">
       Cargando marcadores obsoletos...
     </div>
@@ -73,6 +73,10 @@ const getIconUrl = (faviconUrl: string | undefined) => {
 </template>
 
 <style scoped>
+.obsolete-container {
+  padding: 1rem;
+}
+
 .obsolete-title {
   font-size: 1.2rem;
   color: #888;
