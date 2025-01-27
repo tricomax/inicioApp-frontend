@@ -15,19 +15,6 @@ export const useBookmarksStore = defineStore('bookmarks', () => {
   const error = ref<string | null>(null);
 
   /**
-   * Obtiene el token de autenticación del usuario actual.
-   * @throws Error si el usuario no está autenticado
-   * @returns Promise con el token de autenticación
-   */
-  const getAuthToken = async () => {
-    const authStore = useAuthStore();
-    if (!authStore.user) {
-      throw new Error("Usuario no autenticado");
-    }
-    return await authStore.user.getIdToken();
-  };
-
-  /**
    * Obtiene los marcadores desde la caché del servidor.
    * Esta función no refresca los datos desde el archivo XBEL,
    * solo obtiene los datos almacenados en la caché del servidor.
@@ -39,14 +26,8 @@ export const useBookmarksStore = defineStore('bookmarks', () => {
     error.value = null;
 
     try {
-      const token = await getAuthToken();
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/bookmarks`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        `${import.meta.env.VITE_API_BASE_URL}/bookmarks`
       );
 
       console.log('Datos de bookmarks:', response.data.data.bookmarks);

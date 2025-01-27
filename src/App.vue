@@ -10,15 +10,15 @@ const authStore = useAuthStore();
 const xbelReloadStore = useXbelReloadStore();
 
 const handleXbelReload = async () => {
-  await xbelReloadStore.reloadXbel();
-};
-
-const handleLogin = async () => {
-  try {
-    await authService.login();
-  } catch (error) {
-    console.error('Error al iniciar sesión:', error);
+  if (!authStore.isAuthenticated) {
+    try {
+      await authService.login();
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      return;
+    }
   }
+  await xbelReloadStore.reloadXbel();
 };
 
 const handleLogout = async () => {
@@ -32,31 +32,22 @@ const handleLogout = async () => {
 
 <template>
   <div class="app-container">
-    <!-- Pantalla de bienvenida para usuarios no autenticados -->
-    <div v-if="!authStore.isAuthenticated" class="welcome-screen">
-      <h1>Bienvenido a la Aplicación de Marcadores</h1>
-      <p>Inicia sesión para acceder a tus marcadores</p>
-      <button @click="handleLogin" class="login-button">
-        Iniciar sesión con Google
-      </button>
-    </div>
-
-    <!-- Contenido principal para usuarios autenticados -->
-    <div v-else>
+    <div class="app-content">
+      <h3 class="fav-title">Favoritos</h3>
       <!-- Botón de logout -->
-      <div class="logout-container">
+      <div v-if="authStore.isAuthenticated" class="logout-container">
         <button @click="handleLogout" class="logout-button">
           Cerrar sesión
         </button>
       </div>
 
-      <div>
+      <div class="module-container">
         <FavModule />
       </div>
-      <div>
+      <div class="module-container">
         <MainModule />
       </div>
-      <div>
+      <div class="module-container">
         <ObsoleteModule />
       </div>
       <div class="reload-section">
@@ -81,6 +72,13 @@ const handleLogout = async () => {
 </template>
 
 <style>
+
+.fav-title {
+  font-size: 1.2rem;
+  color: #888;
+  padding-top: 0.2rem;
+}
+
 body {
   background-color: black;
   color: white;
@@ -93,51 +91,11 @@ body {
   min-height: 100vh;
 }
 
-/* Estilos para la pantalla de bienvenida */
-.welcome-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  text-align: center;
-  padding: 2rem;
-}
-
-.welcome-screen h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: #fff;
-}
-
-.welcome-screen p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  color: #ccc;
-}
-
-.login-button {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  background: #4285f4;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.login-button:hover {
-  background: #357abd;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
-}
-
 /* Estilos para el botón de logout */
 .logout-container {
   position: absolute;
+  right: calc((100% - 95%) / 2);
   top: 1rem;
-  right: 1rem;
   z-index: 100;
 }
 
@@ -145,17 +103,16 @@ body {
   padding: 0.5rem 1rem;
   background: transparent;
   color: #ccc;
-  border: 1px solid #666;
-  border-radius: 4px;
+  border: 2px solid #333;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
   font-size: 0.9rem;
 }
 
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #3a3a3a;
   color: white;
-  border-color: #999;
+  border: 2px solid #333;
 }
 
 /* Estilos existentes */
@@ -169,10 +126,10 @@ body {
 
 .reload-button {
   padding: 0.75rem 1.5rem;
-  background: #2c3e50;
+  background: transparent;
   color: white;
-  border: none;
-  border-radius: 6px;
+  border: 2px solid #333;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -182,7 +139,7 @@ body {
 }
 
 .reload-button:hover:not(:disabled) {
-  background: #34495e;
+  background: #3a3a3a;
   transform: translateY(-1px);
 }
 
@@ -215,5 +172,19 @@ body {
   color: #e74c3c;
   text-align: center;
   margin-bottom: 0.5rem;
+}
+
+.app-content {
+  width: 95%;
+  margin: 0 auto;
+}
+
+.module-container {
+  width: 100%;
+  margin: 1rem auto;
+}
+
+.module-container:first-of-type {
+  margin-top: 1rem;
 }
 </style>

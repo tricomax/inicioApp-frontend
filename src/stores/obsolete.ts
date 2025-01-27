@@ -15,19 +15,6 @@ export const useObsoleteStore = defineStore('obsolete', () => {
   const error = ref<string | null>(null);
 
   /**
-   * Obtiene el token de autenticación del usuario actual.
-   * @throws Error si el usuario no está autenticado
-   * @returns Promise con el token de autenticación
-   */
-  const getAuthToken = async () => {
-    const authStore = useAuthStore();
-    if (!authStore.user) {
-      throw new Error("Usuario no autenticado");
-    }
-    return await authStore.user.getIdToken();
-  };
-
-  /**
    * Obtiene la lista de marcadores obsoletos desde el servidor.
    * Actualiza el estado del store con los resultados o el error si ocurre.
    * @throws Error si hay un problema al obtener los marcadores
@@ -37,14 +24,8 @@ export const useObsoleteStore = defineStore('obsolete', () => {
     error.value = null;
 
     try {
-      const token = await getAuthToken();
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/obsolete-bookmarks`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        `${import.meta.env.VITE_API_BASE_URL}/obsolete-bookmarks`
       );
 
       items.value = response.data.data.obsoleteBookmarks;

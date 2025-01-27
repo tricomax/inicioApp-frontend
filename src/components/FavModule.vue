@@ -39,7 +39,6 @@ onUnmounted(() => {
 
 <template>
   <div class="p-4">
-    <h3 class="fav-title">Favoritos</h3>
     <div v-if="favoritesStore.items.length > 0" class="favorites-grid">
       <BookmarkComponent
         v-for="item in favoritesStore.items"
@@ -77,12 +76,6 @@ onUnmounted(() => {
   color: #666;
 }
 
-.fav-title {
-  font-size: 1.2rem;
-  color: #888;
-  margin-bottom: 1rem;
-  padding-left: 1rem;
-}
 
 .bookmark-item {
   width: 90px !important;  /* Ligeramente más pequeño que las carpetas */
