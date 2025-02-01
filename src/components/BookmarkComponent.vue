@@ -153,6 +153,11 @@ const handleFileSelect = async (event: Event) => {
   border-radius: 12px;
   overflow: hidden;
 }
+.bookmark-card:hover {
+  background: #7b7265;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
 
 .bookmark-content {
   height: 100%;
@@ -202,12 +207,6 @@ const handleFileSelect = async (event: Event) => {
   height: 90px;
   display: flex;
   flex-direction: column;
-}
-
-.bookmark-card:hover {
-  background: #7b7265;
-  transform: translateY(-1px);
-  transition: all 0.2s ease;
 }
 
 .favorite-button {

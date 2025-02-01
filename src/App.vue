@@ -86,7 +86,7 @@ const handleLogout = async () => {
 
 .app-container .fav-title {
   font-size: 1.2rem;
-  color: #888;
+  color: white;
   margin: 0;
   padding-left: 1rem;
   height: 28px;

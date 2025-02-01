@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, inject } from "vue";
-import { useAuthStore } from "../stores/auth";
 import { useFavoritesStore } from '../stores/favorites';
 import type { AxiosInstance } from "axios";
 import BookmarkComponent from "./BookmarkComponent.vue";
 
 const api = inject<AxiosInstance>("api")!;
-const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
 
 const loadFavorites = async () => {
   try {
-    if (authStore.user) {
-      await favoritesStore.fetchFavorites();
-    }
+    await favoritesStore.fetchFavorites();
   } catch (error) {
     console.error("Error fetching favorites:", error);
   }
