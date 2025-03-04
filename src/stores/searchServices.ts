@@ -5,29 +5,30 @@ const STORAGE_KEY = 'search-services-config';
 
 const defaultServices: SearchService[] = [
   {
-    id: 'google',
-    name: 'Google',
-    url: 'https://www.google.com/search?q={query}',
-    active: true
-  },
-  {
-    id: 'bing',
-    name: 'Bing',
-    url: 'https://www.bing.com/search?q={query}',
-    active: false
-  },
-  {
     id: 'perplexity',
     name: 'Perplexity',
     url: 'https://www.perplexity.ai/search?q={query}',
     active: false
   },
   {
+    id: 'google',
+    name: 'Google',
+    url: 'https://www.google.com/search?q={query}',
+    active: true
+  },
+  {
     id: 'brave',
     name: 'Brave Search',
     url: 'https://search.brave.com/search?q={query}',
     active: false
+  },
+  {
+    id: 'bing',
+    name: 'Bing',
+    url: 'https://www.bing.com/search?q={query}',
+    active: false
   }
+
 ];
 
 const loadFromLocalStorage = (): SearchService[] | null => {
@@ -69,18 +70,11 @@ export const useSearchStore = defineStore('search', {
     executeSearch(query: string) {
       const activeServices = this.services.filter(s => s.active);
 
-      // Usar Promise.all para abrir las pestañas de manera controlada
-      Promise.all(
-        activeServices.map((service, index) => {
-          return new Promise(resolve => {
-            setTimeout(() => {
-              const url = service.url.replace('{query}', encodeURIComponent(query));
-              window.open(url, '_blank');
-              resolve(true);
-            }, index * 100); // Pequeño retraso entre cada apertura
-          });
-        })
-      );
+      // Abrir todas las pestañas de manera simultánea
+      activeServices.forEach(service => {
+        const url = service.url.replace('{query}', encodeURIComponent(query));
+        window.open(url, '_blank');
+      });
     }
   }
 });
