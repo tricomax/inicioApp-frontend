@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import FolderComponent from "./FolderComponent.vue";
 import BookmarkComponent from "./BookmarkComponent.vue";
+import FinderComponent from "./FinderComponent.vue";
 import { useBookmarksStore } from "../stores/bookmarks";
 import type { BookmarkItem } from "../types/bookmarks";
 
@@ -47,7 +48,10 @@ const closeFolder = () => {
 </script>
 
 <template>
-  <div class="main-container">
+<div class="main-container">
+    <div class="header-section">
+      <FinderComponent />
+    </div>
     <div v-if="bookmarksStore.error">
       <p class="error-text">{{ bookmarksStore.error }}</p>
     </div>
@@ -83,6 +87,13 @@ const closeFolder = () => {
 <style scoped>
 .main-container {
   padding: 1rem 1rem 0;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .error-text {
